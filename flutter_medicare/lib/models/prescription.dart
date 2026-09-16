@@ -16,12 +16,12 @@ class MedicineItem {
   });
 
   factory MedicineItem.fromJson(Map<String, dynamic> json) => MedicineItem(
-        id: json['id'] as String,
-        name: json['name'] as String,
-        dosage: json['dosage'] as String,
-        frequency: json['frequency'] as String,
-        duration: json['duration'] as String,
-        instructions: json['instructions'] as String? ?? '',
+        id: (json['id'] as String?) ?? 'med-${DateTime.now().millisecondsSinceEpoch}',
+        name: (json['name'] as String?) ?? '',
+        dosage: (json['dosage'] as String?) ?? '',
+        frequency: (json['frequency'] as String?) ?? '',
+        duration: (json['duration'] as String?) ?? '',
+        instructions: (json['instructions'] as String?) ?? '',
       );
 
   Map<String, dynamic> toJson() => {
@@ -36,7 +36,7 @@ class MedicineItem {
 
 class Prescription {
   final String id;
-  final String appointmentId;
+  final String? appointmentId;
   final String patientId;
   final String patientName;
   final String doctorId;
@@ -44,13 +44,13 @@ class Prescription {
   final String doctorSpecialization;
   final String hospitalName;
   final String date;
-  final String diagnosis;
-  final String generalAdvice;
+  final String? diagnosis;
+  final String? generalAdvice;
   final List<MedicineItem> medicines;
 
   const Prescription({
     required this.id,
-    required this.appointmentId,
+    this.appointmentId,
     required this.patientId,
     required this.patientName,
     required this.doctorId,
@@ -58,40 +58,49 @@ class Prescription {
     required this.doctorSpecialization,
     required this.hospitalName,
     required this.date,
-    required this.diagnosis,
-    required this.generalAdvice,
+    this.diagnosis,
+    this.generalAdvice,
     required this.medicines,
   });
 
-  factory Prescription.fromJson(Map<String, dynamic> json) => Prescription(
-        id: json['id'] as String,
-        appointmentId: json['appointmentId'] as String,
-        patientId: json['patientId'] as String,
-        patientName: json['patientName'] as String,
-        doctorId: json['doctorId'] as String,
-        doctorName: json['doctorName'] as String,
-        doctorSpecialization: json['doctorSpecialization'] as String,
-        hospitalName: json['hospitalName'] as String,
-        date: json['date'] as String,
-        diagnosis: json['diagnosis'] as String,
-        generalAdvice: json['generalAdvice'] as String? ?? '',
-        medicines: (json['medicines'] as List)
-            .map((m) => MedicineItem.fromJson(m as Map<String, dynamic>))
-            .toList(),
-      );
+  factory Prescription.fromJson(Map<String, dynamic> json) {
+    var rawMeds = json['medicines'];
+    List<MedicineItem> medList = [];
+    if (rawMeds is List) {
+      medList = rawMeds
+          .whereType<Map<String, dynamic>>()
+          .map((m) => MedicineItem.fromJson(m))
+          .toList();
+    }
+
+    return Prescription(
+      id: (json['id'] as String?) ?? '',
+      appointmentId: (json['appointment_id'] ?? json['appointmentId']) as String?,
+      patientId: (json['patient_id'] ?? json['patientId'] ?? '') as String,
+      patientName: (json['patient_name'] ?? json['patientName'] ?? 'Patient') as String,
+      doctorId: (json['doctor_id'] ?? json['doctorId'] ?? '') as String,
+      doctorName: (json['doctor_name'] ?? json['doctorName'] ?? 'Doctor') as String,
+      doctorSpecialization: (json['doctor_specialization'] ?? json['doctorSpecialty'] ?? json['specialization'] ?? 'General Medicine') as String,
+      hospitalName: (json['hospital_name'] ?? json['hospitalName'] ?? 'Medicare Hospital') as String,
+      date: (json['date'] as String?) ?? DateTime.now().toIso8601String().split('T').first,
+      diagnosis: (json['diagnosis'] as String?),
+      generalAdvice: (json['general_advice'] ?? json['generalAdvice']) as String?,
+      medicines: medList,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         'id': id,
-        'appointmentId': appointmentId,
-        'patientId': patientId,
-        'patientName': patientName,
-        'doctorId': doctorId,
-        'doctorName': doctorName,
-        'doctorSpecialization': doctorSpecialization,
-        'hospitalName': hospitalName,
+        'appointment_id': appointmentId,
+        'patient_id': patientId,
+        'patient_name': patientName,
+        'doctor_id': doctorId,
+        'doctor_name': doctorName,
+        'doctor_specialization': doctorSpecialization,
+        'hospital_name': hospitalName,
         'date': date,
         'diagnosis': diagnosis,
-        'generalAdvice': generalAdvice,
+        'general_advice': generalAdvice,
         'medicines': medicines.map((m) => m.toJson()).toList(),
       };
 }

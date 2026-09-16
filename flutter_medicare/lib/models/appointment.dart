@@ -1,4 +1,4 @@
-enum AppointmentStatus { upcoming, completed, cancelled }
+enum AppointmentStatus { pending, confirmed, completed, cancelled }
 
 class Appointment {
   final String id;
@@ -37,44 +37,101 @@ class Appointment {
     required this.createdAt,
   });
 
-  factory Appointment.fromJson(Map<String, dynamic> json) => Appointment(
-        id: json['id'] as String,
-        patientId: json['patientId'] as String,
-        patientName: json['patientName'] as String,
-        doctorId: json['doctorId'] as String,
-        doctorName: json['doctorName'] as String,
-        doctorSpecialty: json['doctorSpecialty'] as String,
-        doctorAvatar: json['doctorAvatar'] as String,
-        hospitalId: json['hospitalId'] as String,
-        hospitalName: json['hospitalName'] as String,
-        hospitalAddress: json['hospitalAddress'] as String,
-        date: json['date'] as String,
-        time: json['time'] as String,
-        reason: json['reason'] as String,
-        status: AppointmentStatus.values.firstWhere(
-          (e) => e.name == json['status'],
-          orElse: () => AppointmentStatus.upcoming,
-        ),
-        amount: (json['amount'] as num).toInt(),
-        createdAt: json['createdAt'] as String,
-      );
+  factory Appointment.fromJson(Map<String, dynamic> json) {
+    final rawStatus = (json['status'] as String? ?? 'pending').toLowerCase();
+    AppointmentStatus parsedStatus;
+    switch (rawStatus) {
+      case 'confirmed':
+        parsedStatus = AppointmentStatus.confirmed;
+        break;
+      case 'completed':
+        parsedStatus = AppointmentStatus.completed;
+        break;
+      case 'cancelled':
+      case 'rejected':
+        parsedStatus = AppointmentStatus.cancelled;
+        break;
+      case 'pending':
+      case 'upcoming':
+      default:
+        parsedStatus = AppointmentStatus.pending;
+        break;
+    }
+
+    return Appointment(
+      id: json['id'] as String? ?? '',
+      patientId: (json['patient_id'] ?? json['patientId']) as String? ?? '',
+      patientName: (json['patient_name'] ?? json['patientName']) as String? ?? 'Patient',
+      doctorId: (json['doctor_id'] ?? json['doctorId']) as String? ?? '',
+      doctorName: (json['doctor_name'] ?? json['doctorName']) as String? ?? 'Doctor',
+      doctorSpecialty: (json['doctor_specialty'] ?? json['doctorSpecialty']) as String? ?? 'General Medicine',
+      doctorAvatar: (json['doctor_avatar'] ?? json['doctorAvatar']) as String? ?? '',
+      hospitalId: (json['hospital_id'] ?? json['hospitalId']) as String? ?? '',
+      hospitalName: (json['hospital_name'] ?? json['hospitalName']) as String? ?? 'Medicare Hospital',
+      hospitalAddress: (json['hospital_address'] ?? json['hospitalAddress']) as String? ?? 'Healthcare Complex',
+      date: (json['appointment_date'] ?? json['date']) as String? ?? DateTime.now().toIso8601String().split('T').first,
+      time: (json['appointment_time'] ?? json['time']) as String? ?? '10:00 AM',
+      reason: json['reason'] as String? ?? 'General Consultation',
+      status: parsedStatus,
+      amount: (json['amount'] as num?)?.toInt() ?? 500,
+      createdAt: (json['created_at'] ?? json['createdAt']) as String? ?? DateTime.now().toIso8601String(),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         'id': id,
-        'patientId': patientId,
-        'patientName': patientName,
-        'doctorId': doctorId,
-        'doctorName': doctorName,
-        'doctorSpecialty': doctorSpecialty,
-        'doctorAvatar': doctorAvatar,
-        'hospitalId': hospitalId,
-        'hospitalName': hospitalName,
-        'hospitalAddress': hospitalAddress,
-        'date': date,
-        'time': time,
+        'patient_id': patientId,
+        'patient_name': patientName,
+        'doctor_id': doctorId,
+        'doctor_name': doctorName,
+        'doctor_specialty': doctorSpecialty,
+        'doctor_avatar': doctorAvatar,
+        'hospital_id': hospitalId,
+        'hospital_name': hospitalName,
+        'hospital_address': hospitalAddress,
+        'appointment_date': date,
+        'appointment_time': time,
         'reason': reason,
         'status': status.name,
         'amount': amount,
-        'createdAt': createdAt,
+        'created_at': createdAt,
       };
+
+  Appointment copyWith({
+    String? id,
+    String? patientId,
+    String? patientName,
+    String? doctorId,
+    String? doctorName,
+    String? doctorSpecialty,
+    String? doctorAvatar,
+    String? hospitalId,
+    String? hospitalName,
+    String? hospitalAddress,
+    String? date,
+    String? time,
+    String? reason,
+    AppointmentStatus? status,
+    int? amount,
+    String? createdAt,
+  }) {
+    return Appointment(
+      id: id ?? this.id,
+      patientId: patientId ?? this.patientId,
+      patientName: patientName ?? this.patientName,
+      doctorId: doctorId ?? this.doctorId,
+      doctorName: doctorName ?? this.doctorName,
+      doctorSpecialty: doctorSpecialty ?? this.doctorSpecialty,
+      doctorAvatar: doctorAvatar ?? this.doctorAvatar,
+      hospitalId: hospitalId ?? this.hospitalId,
+      hospitalName: hospitalName ?? this.hospitalName,
+      hospitalAddress: hospitalAddress ?? this.hospitalAddress,
+      date: date ?? this.date,
+      time: time ?? this.time,
+      reason: reason ?? this.reason,
+      status: status ?? this.status,
+      amount: amount ?? this.amount,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
 }
