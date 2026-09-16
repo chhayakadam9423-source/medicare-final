@@ -11,7 +11,7 @@ class AppTheme {
 
   static ThemeData lightTheme([BuildContext? context]) {
     final baseTextTheme = context != null
-        ? (Theme.maybeOf(context)?.textTheme ?? ThemeData.light().textTheme)
+        ? Theme.of(context).textTheme
         : ThemeData.light().textTheme;
 
     return ThemeData(
@@ -36,7 +36,7 @@ class AppTheme {
           fontWeight: FontWeight.w800,
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: Colors.white,
         elevation: 1,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -46,7 +46,7 @@ class AppTheme {
 
   static ThemeData darkTheme([BuildContext? context]) {
     final baseTextTheme = context != null
-        ? (Theme.maybeOf(context)?.textTheme ?? ThemeData.dark().textTheme)
+        ? Theme.of(context).textTheme
         : ThemeData.dark().textTheme;
 
     return ThemeData(
@@ -73,7 +73,7 @@ class AppTheme {
           fontWeight: FontWeight.w800,
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: darkSurface,
         elevation: 1,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
