@@ -481,22 +481,33 @@ class LocalStorageService {
 `,
     },
     'build.gradle': {
-      desc: 'Android module Gradle build configuration (Sdk 34, MinSdk 21)',
-      code: `android {
+      desc: 'Android module Gradle build configuration (Sdk 34, MinSdk 21, Flutter Gradle Plugin DSL)',
+      code: `plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+android {
     namespace "com.medicare.app"
     compileSdkVersion 34
+    ndkVersion flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
 
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+
     defaultConfig {
         applicationId "com.medicare.app"
         minSdkVersion 21
         targetSdkVersion 34
-        versionCode 1
-        versionName "1.0.0"
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
         multiDexEnabled true
     }
 }
