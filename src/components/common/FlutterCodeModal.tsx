@@ -481,7 +481,7 @@ class LocalStorageService {
 `,
     },
     'build.gradle': {
-      desc: 'Android module Gradle build configuration (Sdk 34, MinSdk 21, Flutter Gradle Plugin DSL, Gradle 8.14, AGP 8.11.1)',
+      desc: 'Android module Gradle build configuration (CompileSdk 36, TargetSdk 34, MinSdk 21, Gradle 8.14, AGP 8.11.1)',
       code: `plugins {
     id "com.android.application"
     id "kotlin-android"
@@ -490,7 +490,7 @@ class LocalStorageService {
 
 android {
     namespace "com.medicare.app"
-    compileSdk 34
+    compileSdk 36
     ndkVersion flutter.ndkVersion
 
     compileOptions {
